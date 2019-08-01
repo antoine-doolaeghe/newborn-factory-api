@@ -1,0 +1,14 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "newborn-factory-api-20190730220438-authRole",
+            "UnauthRoleArn": "arn:aws:iam::121745008486:role/newborn-factory-api-20190730220438-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::121745008486:role/newborn-factory-api-20190730220438-authRole",
+            "Region": "eu-west-1",
+            "DeploymentBucketName": "newborn-factory-api-20190730220438-deployment",
+            "UnauthRoleName": "newborn-factory-api-20190730220438-unauthRole",
+            "StackName": "newborn-factory-api-20190730220438",
+            "StackId": "arn:aws:cloudformation:eu-west-1:121745008486:stack/newborn-factory-api-20190730220438/43179c60-b305-11e9-8712-0a1f01fad44c"
+        }
+    }
+}
