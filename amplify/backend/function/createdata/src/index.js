@@ -1,12 +1,19 @@
 const aws = require("aws-sdk");
 const faker = require("faker");
+const returnBatchParams = require("./utils/config").returnBatchParams;
+const createNewborns = require("./utils/createNewborns").createNewborns;
+const returnTrainerRequest = require("./utils/requestUtils")
+  .returnTrainerRequest;
+
+// create dynamis user ownership
+// create ticket for MOCK MORPHOLOGY FUNCTION
 
 aws.config.update({ region: "eu-west-1" });
 const ddb = new aws.DynamoDB({ apiVersion: "2012-08-10" });
 
 exports.handler = function(event, context) {
-  function returnParams(userNum, newbornNum, trainerNum, summariesNum) {
-    var params = {
+  function returnParams(newbornLimit, trainerLimit, summariesLimit) {
+    let params = {
       users: [],
       generations: [],
       episodes: [],
@@ -15,178 +22,44 @@ exports.handler = function(event, context) {
       models: [],
       trainers: []
     };
-    const generationId = faker.random.uuid();
-    params.generations.push({
+    const userId = "37fd2f0b-1fc2-47c9-9bc5-5013798db609";
+
+    // create user
+    params.users.push({
       PutRequest: {
         Item: {
-          id: { S: generationId },
-          index: { S: "0" }
+          id: { S: userId },
+          userName: { S: faker.name.findName() },
+          profileImage: { S: faker.image.avatar() }
         }
       }
     });
-    for (var i = 0; i <= userNum; i++) {
-      const userId = faker.random.uuid();
-      params.users.push({
-        PutRequest: {
-          Item: {
-            id: { S: userId },
-            userName: { S: faker.name.findName() },
-            profileImage: { S: faker.image.avatar() }
-          }
-        }
-      });
-      for (var y = 0; y <= newbornNum; y++) {
-        const newbornId = faker.random.uuid();
-        const modelId = faker.random.uuid();
-        const episodeId = faker.random.uuid();
-        params.newborns.push({
-          PutRequest: {
-            Item: {
-              id: { S: newbornId },
-              sex: { S: "male" },
-              bornPlace: { S: faker.address.country() },
-              name: { S: faker.name.findName() },
-              bio: { S: faker.lorem.sentences() },
-              training: { BOOL: faker.random.boolean() },
-              newbornOwnerId: { S: userId },
-              newbornGenerationId: { S: generationId }
-            }
-          }
-        });
-        params.models.push({
-          PutRequest: {
-            Item: {
-              id: { S: modelId },
-              modelNewbornId: { S: newbornId }
-            }
-          }
-        });
-        params.episodes.push({
-          PutRequest: {
-            Item: {
-              id: { S: episodeId },
-              created: {
-                S: faker.date.between("2015-01-01", "2015-12-31").toString()
-              },
-              episodeModelId: { S: modelId }
-            }
-          }
-        });
-        for (var z = 0; z <= summariesNum; z++) {
-          params.summaries.push({
-            PutRequest: {
-              Item: {
-                id: { S: faker.random.uuid() },
-                summaryEpisodeId: { S: episodeId },
-                created: {
-                  S: faker.date.between("2015-01-01", "2015-12-31").toString()
-                },
-                meanReward: { S: faker.random.number(100).toString() },
-                standardReward: { S: faker.random.number(100).toString() },
-                step: { S: (z * 100).toString() }
-              }
-            }
-          });
-        }
-      }
-      for (var y = 0; y <= trainerNum; y++) {
-        params.trainers.push({
-          PutRequest: {
-            Item: {
-              id: { S: faker.random.uuid() },
-              trainerOwnerId: { S: userId }
-            }
-          }
-        });
-      }
+
+    for (var y = 0; y <= trainerLimit; y++) {
+      params.trainers.push(returnTrainerRequest(userId));
     }
+
+    params = createNewborns(params, newbornLimit, summariesLimit, userId);
+
     return params;
   }
 
-  const tableParam = returnParams(0, 3, 0, 5);
-  // create user
-  var UserParams = {
-    RequestItems: {
-      "User-cgfnpw6cc5a3hdvevr6vfbvxlq-dev": tableParam.users
-    }
-  };
-  ddb.batchWriteItem(UserParams, function(err, data) {
-    if (err) {
-      console.log("Error", err);
-    } else {
-      console.log("Success", data);
-    }
-  });
-  var GenerationParams = {
-    RequestItems: {
-      "Generation-cgfnpw6cc5a3hdvevr6vfbvxlq-dev": tableParam.generations
-    }
-  };
-  ddb.batchWriteItem(GenerationParams, function(err, data) {
-    if (err) {
-      console.log("Error", err);
-    } else {
-      console.log("Success", data);
-    }
-  });
-  var NewbornParams = {
-    RequestItems: {
-      "Newborn-cgfnpw6cc5a3hdvevr6vfbvxlq-dev": tableParam.newborns
-    }
-  };
-  ddb.batchWriteItem(NewbornParams, function(err, data) {
-    if (err) {
-      console.log("Error", err);
-    } else {
-      console.log("Success", data);
-    }
-  });
-  var EpisodeParams = {
-    RequestItems: {
-      "Episode-cgfnpw6cc5a3hdvevr6vfbvxlq-dev": tableParam.episodes
-    }
-  };
-  ddb.batchWriteItem(EpisodeParams, function(err, data) {
-    if (err) {
-      console.log("Error", err);
-    } else {
-      console.log("Success", data);
-    }
-  });
-  var ModelParams = {
-    RequestItems: {
-      "Model-cgfnpw6cc5a3hdvevr6vfbvxlq-dev": tableParam.models
-    }
-  };
-  ddb.batchWriteItem(ModelParams, function(err, data) {
-    if (err) {
-      console.log("Error", err);
-    } else {
-      console.log("Success", data);
-    }
-  });
-  var TrainerParams = {
-    RequestItems: {
-      "Trainer-cgfnpw6cc5a3hdvevr6vfbvxlq-dev": tableParam.trainers
-    }
-  };
-  ddb.batchWriteItem(TrainerParams, function(err, data) {
-    if (err) {
-      console.log("Error", err);
-    } else {
-      console.log("Success", data);
-    }
-  });
-  var SummaryParams = {
-    RequestItems: {
-      "Summary-cgfnpw6cc5a3hdvevr6vfbvxlq-dev": tableParam.summaries
-    }
-  };
-  ddb.batchWriteItem(SummaryParams, function(err, data) {
-    if (err) {
-      console.log("Error", err);
-    } else {
-      console.log("Success", data);
-    }
-  });
+  const tableParam = returnParams(30, 1, 40);
+
+  var batchParams = returnBatchParams(tableParam);
+
+  try {
+    batchParams.forEach(function(params) {
+      ddb.batchWriteItem(params, function(err, data) {
+        if (err) {
+          return err;
+        } else {
+          console.log("Success", data);
+        }
+      });
+      return "success";
+    });
+  } catch (err) {
+    return err;
+  }
 };
