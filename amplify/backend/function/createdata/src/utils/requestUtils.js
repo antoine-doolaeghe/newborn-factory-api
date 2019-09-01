@@ -13,7 +13,7 @@ var returnNewbornRequest = function returnNewbornRequest(
       Item: {
         id: { S: newbornId },
         sex: { S: newbornSex },
-        birthDate: { S: faker.address.date.past(1) },
+        birthDate: { S: faker.date.past(1) },
         bornPlace: { S: faker.address.country() },
         name: { S: faker.name.findName() },
         bio: { S: faker.lorem.sentences() },
