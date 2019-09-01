@@ -60,7 +60,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "newborn-factory-api-20190730220438-deployment",
-					"S3Key": "amplify-builds/createdata-1567352364-latest-build.zip"
+					"S3Key": "amplify-builds/createdata-1567364301-latest-build.zip"
 				}
 			}
 		},

@@ -4,6 +4,12 @@ const returnEpisodeRequest = require("./requestUtils").returnEpisodeRequest;
 const returnSummaryRequest = require("./requestUtils").returnSummaryRequest;
 const returnNewbornRequest = require("./requestUtils").returnNewbornRequest;
 
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 var createNewborn = function createNewborn(
   params,
   summariesLimit,
@@ -20,8 +26,11 @@ var createNewborn = function createNewborn(
   const newbornParents = parent;
   params.models.push(returnModelRequest(modelId, newbornId));
   params.episodes.push(returnEpisodeRequest(episodeId, modelId));
-  for (var z = 0; z <= summariesLimit; z++) {
-    params.summaries.push(returnSummaryRequest(episodeId, z));
+  // only push summaries in 1/5 to simulate no summary episode.
+  if (getRandomInt(0, 5) != 5) {
+    for (var z = 0; z <= summariesLimit; z++) {
+      params.summaries.push(returnSummaryRequest(episodeId, z));
+    }
   }
   if (partner) {
     const partnerSex = partner.PutRequest.Item.sex.S;
