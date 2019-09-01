@@ -13,10 +13,12 @@ var returnNewbornRequest = function returnNewbornRequest(
       Item: {
         id: { S: newbornId },
         sex: { S: newbornSex },
+        birthDate: { S: faker.address.date.past(1) },
         bornPlace: { S: faker.address.country() },
         name: { S: faker.name.findName() },
         bio: { S: faker.lorem.sentences() },
         training: { BOOL: faker.random.boolean() },
+        hexColor: { S: "#" + ((Math.random() * 0xffffff) << 0).toString(16) },
         newbornOwnerId: { S: userId },
         newbornGenerationId: { S: generationId },
         partners: newbornPartners.length ? { SS: newbornPartners } : null,
@@ -62,6 +64,8 @@ var returnSummaryRequest = function returnSummaryRequest(episodeId, index) {
         },
         meanReward: { S: faker.random.number(100).toString() },
         standardReward: { S: faker.random.number(100).toString() },
+        valueLoss: { S: faker.random.number(100).toString() },
+        entropy: { S: faker.random.number(100).toString() },
         step: { S: (index * 100).toString() }
       }
     }

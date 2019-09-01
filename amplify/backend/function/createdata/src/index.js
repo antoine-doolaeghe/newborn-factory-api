@@ -5,9 +5,6 @@ const createNewborns = require("./utils/createNewborns").createNewborns;
 const returnTrainerRequest = require("./utils/requestUtils")
   .returnTrainerRequest;
 
-// create dynamis user ownership
-// create ticket for MOCK MORPHOLOGY FUNCTION
-
 aws.config.update({ region: "eu-west-1" });
 const ddb = new aws.DynamoDB({ apiVersion: "2012-08-10" });
 
